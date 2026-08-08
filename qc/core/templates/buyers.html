@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block c %}
+<h2>Buyers Management</h2>
+
+{% if user.role == 'admin' or user.role == 'merch' %}
+  <div style="background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 6px; margin-bottom: 24px;">
+    <h3>Add Buyer</h3>
+    <form method="post" style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+      {% csrf_token %}
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: var(--text-muted);">Name</label>
+        {{ form.name }}
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: var(--text-muted);">Code</label>
+        {{ form.code }}
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: var(--text-muted);">Notes</label>
+        {{ form.notes }}
+      </div>
+      <button class="btn">Create Buyer</button>
+    </form>
+  </div>
+{% endif %}
+
+<table>
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Buyer Name</th>
+      <th>Default Size Set</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for b in buyers %}
+      <tr>
+        <td><strong>{{ b.code }}</strong></td>
+        <td>{{ b.name }}</td>
+        <td>{{ b.default_sizeset.name|default:"EU_ALPHA" }}</td>
+        <td>{{ b.notes }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No buyers registered.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

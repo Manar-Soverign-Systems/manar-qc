@@ -1,0 +1,37 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MANAR QC — Sovereign Quality System</title>
+  <link rel="stylesheet" href="{% static 'manar.css' %}">
+  <script src="{% static 'htmx.min.js' %}"></script>
+</head>
+<body>
+  <nav>
+    <a href="{% url 'dashboard' %}" class="brand">MANAR QC</a>
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    <a href="{% url 'buyers' %}">Buyers</a>
+    <a href="{% url 'styles' %}">Styles</a>
+    <a href="{% url 'workorders' %}">Work Orders</a>
+    <a href="{% url 'aggregates' %}">Aggregates</a>
+    <a href="{% url 'verify_record' %}">Verify</a>
+    <a href="{% url 'sync_upload' %}">Sync Upload</a>
+    <div style="margin-left: auto; display: flex; gap: 12px; align-items: center;">
+      <span style="color: var(--text-muted);">{{ user.email }} [{{ user.role }}]</span>
+      <a href="{% url 'logout' %}" style="color: var(--accent-red);">Logout</a>
+    </div>
+  </nav>
+  <main>
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% block c %}{% endblock %}
+  </main>
+</body>
+</html>

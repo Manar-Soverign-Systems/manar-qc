@@ -1,0 +1,47 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MANAR QC — Login</title>
+  <link rel="stylesheet" href="{% static 'manar.css' %}">
+</head>
+<body style="display: grid; place-items: center; min-height: 100vh; background-color: var(--bg-color);">
+  <div style="background-color: var(--panel-bg); padding: 32px; border-radius: 8px; border: 1px solid var(--border-color); width: 340px;">
+    <h2 style="margin-bottom: 8px; color: var(--accent-green);">MANAR QC</h2>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Dimensional Control Portal</p>
+
+    {% if error %}
+      <div style="background: rgba(239, 68, 68, 0.2); color: var(--accent-red); padding: 10px; border-radius: 4px; margin-bottom: 16px;">
+        {{ error }}
+      </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Vendor Code</label>
+        <input name="tenant" placeholder="e.g. MASOOD / DEMO" required style="width: 100%; box-sizing: border-box;">
+      </div>
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Email</label>
+        <input name="email" type="email" placeholder="user@vendor.com" required style="width: 100%; box-sizing: border-box;">
+      </div>
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Password</label>
+        <input name="password" type="password" required style="width: 100%; box-sizing: border-box;">
+      </div>
+      <button class="btn" style="width: 100%;">Sign In</button>
+    </form>
+
+    <div style="margin-top: 20px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 16px;">
+      <a href="{% url 'activate' %}" style="color: var(--text-muted); font-size: 0.85rem;">Activate new tenant key</a>
+      {% if sso_enabled %}
+        <br><br>
+        <a href="{% url 'sso_login' %}" class="btn btn-success" style="width: 100%; box-sizing: border-box;">Sign in with SSO</a>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

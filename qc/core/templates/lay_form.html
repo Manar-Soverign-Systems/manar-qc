@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block c %}
+<h2>Add Lay to PO: {{ wo.po_number }}</h2>
+
+<div style="background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 6px; max-width: 500px;">
+  <form method="post">
+    {% csrf_token %}
+    <div style="margin-bottom: 16px;">
+      <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Lay Number</label>
+      {{ form.lay_number }}
+    </div>
+    <div style="margin-bottom: 16px;">
+      <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Fabric Batch</label>
+      {{ form.fabric_batch }}
+    </div>
+    <div style="margin-bottom: 16px;">
+      <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Shade</label>
+      {{ form.shade }}
+    </div>
+    <div style="margin-bottom: 16px;">
+      <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Plies</label>
+      {{ form.plies }}
+    </div>
+    <div style="margin-bottom: 20px;">
+      <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Shrinkage Band (mm)</label>
+      {{ form.shrinkage_band_mm }}
+    </div>
+    <button class="btn btn-success">Save Lay</button>
+  </form>
+</div>
+{% endblock %}

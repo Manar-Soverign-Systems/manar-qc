@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block c %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+  <div>
+    <h2>Style: {{ style.style_code }} — {{ style.name }}</h2>
+    <p style="color: var(--text-muted); margin: 0;">
+      Buyer: {{ style.buyer.name }} | Category: {{ style.category.name }} (Sheet {{ style.category.sheet_id }}) | Status: <span class="badge badge-{{ style.status }}">{{ style.status }}</span>
+    </p>
+  </div>
+  {% if user.role == 'qa' or user.role == 'admin' %}
+    {% if style.status == 'draft' %}
+      <form method="post" action="{% url 'validate_style' style.id %}">
+        {% csrf_token %}
+        <button class="btn btn-success">Validate Style (QA Approve)</button>
+      </form>
+    {% endif %}
+  {% endif %}
+</div>
+
+{% if editable %}
+  <div style="background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 6px; margin-bottom: 32px;">
+    <h3>Import Spec Matrix (CSV Wizard)</h3>
+    <form method="post" action="{% url 'run_import' style.id %}" enctype="multipart/form-data" style="display: flex; gap: 16px; align-items: center;">
+      {% csrf_token %}
+      <input type="file" name="csv" accept=".csv" required>
+      <button class="btn">Upload & Process CSV</button>
+    </form>
+    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+      CSV headers: <code>style_code, buyer, category, domain, size_label, measurement_code, target_mm, tol_plus_mm, tol_minus_mm</code>
+    </p>
+  </div>
+{% endif %}
+
+<h3>SpecSets Matrix</h3>
+
+{% for ss in specsets %}
+  <div style="background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 20px; margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h4>Domain: <span style="color: var(--accent-blue);">{{ ss.domain }}</span> (v{{ ss.version }}) — Status: <span class="badge badge-{{ ss.status }}">{{ ss.status }}</span></h4>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Size</th>
+          <th>Panel (CUT)</th>
+          <th>Measurement Code</th>
+          <th>Target (mm)</th>
+          <th>Tol + (mm)</th>
+          <th>Tol - (mm)</th>
+          {% if ss.status == 'draft' and editable %}<th>Actions</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in ss.specrow_set.all %}
+          <tr>
+            <td><strong>{{ r.size_label }}</strong></td>
+            <td>{{ r.panel_type|default:"—" }}</td>
+            <td>{{ r.code.code }} ({{ r.code.name }})</td>
+            {% if ss.status == 'draft' and editable %}
+              <form method="post" action="{% url 'spec_row_update' r.id %}">
+                {% csrf_token %}
+                <td><input type="number" name="target_mm" value="{{ r.target_mm }}" style="width: 80px;"></td>
+                <td><input type="number" name="tol_plus_mm" value="{{ r.tol_plus_mm }}" style="width: 60px;"></td>
+                <td><input type="number" name="tol_minus_mm" value="{{ r.tol_minus_mm }}" style="width: 60px;"></td>
+                <td>
+                  <button class="btn" style="padding: 2px 6px; font-size: 0.75rem;">Save</button>
+              </form>
+                  <form method="post" action="{% url 'spec_row_delete' r.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button class="btn btn-danger" style="padding: 2px 6px; font-size: 0.75rem;">Del</button>
+                  </form>
+                </td>
+            {% else %}
+              <td>{{ r.target_mm }}</td>
+              <td>+{{ r.tol_plus_mm }}</td>
+              <td>-{{ r.tol_minus_mm }}</td>
+            {% endif %}
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No rows defined in this SpecSet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if ss.status == 'draft' and editable %}
+      <div style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 16px;">
+        <h5 style="margin-bottom: 8px;">Add Row to SpecSet</h5>
+        <form method="post" action="{% url 'spec_row_add' ss.id %}" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+          {% csrf_token %}
+          <div>
+            <label style="display: block; font-size: 0.75rem; color: var(--text-muted);">Size</label>
+            <input name="size_label" placeholder="M" required style="width: 60px;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.75rem; color: var(--text-muted);">Panel</label>
+            <input name="panel_type" placeholder="FRONT" style="width: 80px;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.75rem; color: var(--text-muted);">Code</label>
+            <select name="code" required>
+              {% for m in measurement_codes %}
+                {% if m.domain == ss.domain %}
+                  <option value="{{ m.code }}">{{ m.code }} ({{ m.name }})</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.75rem; color: var(--text-muted);">Target mm</label>
+            <input type="number" name="target_mm" required style="width: 80px;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.75rem; color: var(--text-muted);">Tol +</label>
+            <input type="number" name="tol_plus_mm" value="5" required style="width: 60px;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.75rem; color: var(--text-muted);">Tol -</label>
+            <input type="number" name="tol_minus_mm" value="5" required style="width: 60px;">
+          </div>
+          <button class="btn btn-success" style="padding: 6px 12px; font-size: 0.85rem;">Add Row</button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+{% empty %}
+  <p style="color: var(--text-muted);">No SpecSets created yet. Upload a CSV matrix above to generate draft SpecSets.</p>
+{% endfor %}
+{% endblock %}

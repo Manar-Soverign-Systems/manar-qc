@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block c %}
+<h2>Add Bundles — Lay #{{ lay.lay_number }} (PO: {{ lay.workorder.po_number }})</h2>
+
+<div style="background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 6px; max-width: 500px;">
+  <form method="post">
+    {% csrf_token %}
+    <div style="margin-bottom: 20px;">
+      <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Bundles List (one per line: SIZE, QTY)</label>
+      {{ form.lines }}
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">Example:<br><code>S, 20<br>M, 20<br>L, 20</code></p>
+    </div>
+    <button class="btn btn-success">Generate Bundles</button>
+  </form>
+</div>
+{% endblock %}

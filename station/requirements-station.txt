@@ -1,0 +1,6 @@
+opencv-python
+numpy
+pynacl
+argon2-cffi
+qrcode
+Pillow

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block c %}
+<h2>Work Orders & Lays</h2>
+
+{% if user.role == 'admin' or user.role == 'merch' %}
+  <div style="background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 6px; margin-bottom: 24px;">
+    <h3>Create Work Order</h3>
+    <form method="post" style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+      {% csrf_token %}
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: var(--text-muted);">Buyer</label>
+        {{ form.buyer }}
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: var(--text-muted);">Style</label>
+        {{ form.style }}
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: var(--text-muted);">PO Number</label>
+        {{ form.po_number }}
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: var(--text-muted);">Delivery Date</label>
+        {{ form.delivery_date }}
+      </div>
+      <button class="btn">Create Work Order</button>
+    </form>
+  </div>
+{% endif %}
+
+{% for wo in wos %}
+  <div style="background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 20px; margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h4>PO: <span style="color: var(--accent-green);">{{ wo.po_number }}</span> | Style: {{ wo.style.style_code }} ({{ wo.buyer.name }})</h4>
+      {% if user.role == 'admin' or user.role == 'merch' %}
+        <a href="{% url 'add_lay' wo.id %}" class="btn" style="padding: 4px 10px; font-size: 0.8rem;">+ Add Lay</a>
+      {% endif %}
+    </div>
+
+    {% for lay in wo.lay_set.all %}
+      <div style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <strong>Lay #{{ lay.lay_number }}</strong> — Batch: {{ lay.fabric_batch|default:"N/A" }} | Plies: {{ lay.plies }}
+          {% if user.role == 'admin' or user.role == 'merch' %}
+            <a href="{% url 'add_bundles' lay.id %}" class="btn btn-success" style="padding: 2px 8px; font-size: 0.75rem;">+ Add Bundles</a>
+          {% endif %}
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Bundle Code</th>
+              <th>Size</th>
+              <th>Qty</th>
+              <th>Status</th>
+              <th>Ticket QR</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in lay.bundle_set.all %}
+              <tr>
+                <td><strong>{{ b.bundle_code }}</strong></td>
+                <td>{{ b.size_label }}</td>
+                <td>{{ b.qty }}</td>
+                <td><span class="badge badge-{{ b.status }}">{{ b.status }}</span></td>
+                <td><a href="{% url 'bundle_ticket' b.id %}" class="btn" style="padding: 2px 6px; font-size: 0.75rem;" target="_blank">Print Ticket QR</a></td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No bundles added for this lay.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% empty %}
+      <p style="color: var(--text-muted); font-size: 0.9rem;">No lays recorded for this Work Order.</p>
+    {% endfor %}
+  </div>
+{% empty %}
+  <p style="color: var(--text-muted);">No Work Orders created yet.</p>
+{% endfor %}
+{% endblock %}

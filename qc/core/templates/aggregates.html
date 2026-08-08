@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block c %}
+<h2>Station Aggregates (Opt-in Audits)</h2>
+
+{% for u in ups %}
+  <div style="background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 20px; margin-bottom: 24px;">
+    <h4>Batch: {{ u.filename }} — Uploaded: {{ u.created_at }} by {{ u.uploaded_by }}</h4>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>PO Number</th>
+          <th>Size</th>
+          <th>Verdict</th>
+          <th>Count (n)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in u.summary.batches %}
+          <tr>
+            <td><strong>{{ b.po }}</strong></td>
+            <td>{{ b.size }}</td>
+            <td><span class="badge badge-{{ b.verdict|lower }}">{{ b.verdict }}</span></td>
+            <td>{{ b.n }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No batch summary data.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div style="font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 10px;">
+      <strong>Testers Activity:</strong>
+      {% for t in u.summary.testers %}
+        <span style="margin-right: 16px;">{{ t.code }}: {{ t.n }} pieces ({{ t.not_okay }} non-OK)</span>
+      {% empty %}
+        None recorded
+      {% endfor %}
+      | <strong>Drift Stops:</strong> <span class="badge badge-warn">{{ u.summary.drift_stops|default:0 }}</span>
+    </div>
+  </div>
+{% empty %}
+  <p style="color: var(--text-muted);">No aggregate uploads registered yet.</p>
+{% endfor %}
+{% endblock %}

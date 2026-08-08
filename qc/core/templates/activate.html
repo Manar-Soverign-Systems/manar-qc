@@ -1,0 +1,54 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>MANAR QC — Tenant Activation</title>
+  <link rel="stylesheet" href="{% static 'manar.css' %}">
+</head>
+<body style="display: grid; place-items: center; min-height: 100vh; background-color: var(--bg-color);">
+  <div style="background-color: var(--panel-bg); padding: 32px; border-radius: 8px; border: 1px solid var(--border-color); width: 360px;">
+    <h2 style="margin-bottom: 8px; color: var(--accent-green);">Tenant Activation</h2>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Activate your Manar QC subscription code</p>
+
+    {% if error %}
+      <div style="background: rgba(239, 68, 68, 0.2); color: var(--accent-red); padding: 10px; border-radius: 4px; margin-bottom: 16px;">
+        {{ error }}
+      </div>
+    {% endif %}
+
+    {% if not vendor %}
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="step" value="check">
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Activation Key</label>
+          <input name="code" placeholder="Enter code from contract" required style="width: 100%; box-sizing: border-box;">
+        </div>
+        <button class="btn" style="width: 100%;">Verify Key</button>
+      </form>
+    {% else %}
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="step" value="create">
+        <div style="margin-bottom: 12px; color: var(--accent-green); font-weight: 600;">
+          Vendor Verified: {{ vendor.legal_name }} ({{ vendor.code }})
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Admin Email</label>
+          <input name="email" type="email" required style="width: 100%; box-sizing: border-box;">
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Admin Password (12+ chars)</label>
+          <input name="password" type="password" required style="width: 100%; box-sizing: border-box;">
+        </div>
+        <button class="btn btn-success" style="width: 100%;">Create Admin Account</button>
+      </form>
+    {% endif %}
+
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="{% url 'login' %}" style="color: var(--text-muted); font-size: 0.85rem;">Back to login</a>
+    </div>
+  </div>
+</body>
+</html>

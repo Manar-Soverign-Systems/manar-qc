@@ -1,0 +1,9 @@
+django>=5.0
+psycopg[binary]
+gunicorn
+whitenoise
+argon2-cffi
+pynacl
+qrcode
+pyjwt
+requests

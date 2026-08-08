@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block c %}
+<h2>Styles Management</h2>
+
+{% if user.role == 'admin' or user.role == 'merch' %}
+  <div style="background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 6px; margin-bottom: 24px;">
+    <h3>Add Style</h3>
+    <form method="post" style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+      {% csrf_token %}
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: var(--text-muted);">Buyer</label>
+        {{ form.buyer }}
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: var(--text-muted);">Category</label>
+        {{ form.category }}
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: var(--text-muted);">Style Code</label>
+        {{ form.style_code }}
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: var(--text-muted);">Name</label>
+        {{ form.name }}
+      </div>
+      <button class="btn">Create Style</button>
+    </form>
+  </div>
+{% endif %}
+
+<table>
+  <thead>
+    <tr>
+      <th>Style Code</th>
+      <th>Style Name</th>
+      <th>Buyer</th>
+      <th>Category</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in styles %}
+      <tr>
+        <td><strong>{{ s.style_code }}</strong></td>
+        <td>{{ s.name }}</td>
+        <td>{{ s.buyer.name }}</td>
+        <td>{{ s.category.name }}</td>
+        <td><span class="badge badge-{{ s.status }}">{{ s.status }}</span></td>
+        <td><a href="{% url 'style_detail' s.id %}" class="btn" style="padding: 4px 8px; font-size: 0.8rem;">Specs Matrix</a></td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No styles configured.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

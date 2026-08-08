@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block c %}
+<h2>Record Hash Verification</h2>
+<p style="color: var(--text-muted);">Verify whether a 64-character SHA-256 record hash exists in your vendor's uploaded station audit chains.</p>
+
+<div style="background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 6px; margin-bottom: 24px;">
+  <form method="get" style="display: flex; gap: 12px; align-items: center;">
+    <input name="hash" size="70" placeholder="Enter 64-character record SHA-256 hash" value="{{ hash }}" style="font-family: monospace;">
+    <button class="btn">Verify Hash</button>
+  </form>
+</div>
+
+{% if hash %}
+  {% if hit %}
+    <div style="background-color: rgba(16, 185, 129, 0.2); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 16px; border-radius: 6px;">
+      <strong>VERIFIED</strong> — Present in upload batch <code>{{ hit.filename }}</code> (uploaded {{ hit.created_at }} by {{ hit.uploaded_by }}).
+    </div>
+  {% else %}
+    <div style="background-color: rgba(239, 68, 68, 0.2); border: 1px solid var(--accent-red); color: var(--accent-red); padding: 16px; border-radius: 6px;">
+      <strong>NOT FOUND</strong> — Hash is not present in any registered upload batch for your vendor.
+    </div>
+  {% endif %}
+{% endif %}
+{% endblock %}

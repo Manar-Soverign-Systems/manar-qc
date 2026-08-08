@@ -1,0 +1,13 @@
+[Unit]
+Description=Manar QC Station Kiosk Mode
+After=display-manager.service network.target
+
+[Service]
+WorkingDirectory=/opt/manar
+ExecStart=/opt/manar/.venv/bin/python -m station kiosk --cam 0
+Restart=always
+RestartSec=2
+Environment=MANAR_URDU_FONT=/usr/share/fonts/truetype/noto/NotoNastaliqUrdu-Regular.ttf
+
+[Install]
+WantedBy=graphical.target
