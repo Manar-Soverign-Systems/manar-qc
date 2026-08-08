@@ -31,18 +31,16 @@ services:
       - traefik.enable=true
       - traefik.http.routers.qcg.rule=Host(`qcg.manar.pk`)
       - traefik.http.routers.qcg.entrypoints=websecure
-      - traefik.http.routers.qcg.tls.certresolver=letsencrypt
-      - traefik.http.routers.qcg.middlewares=sec-headers,rate-login
+      - traefik.http.routers.qcg.tls.certresolver=le
       - traefik.http.services.qcg.loadbalancer.server.port=8000
       # Staging
       - traefik.http.routers.qcg-staging.rule=Host(`staging.qcg.manar.pk`)
       - traefik.http.routers.qcg-staging.entrypoints=websecure
-      - traefik.http.routers.qcg-staging.tls.certresolver=letsencrypt
-      - traefik.http.routers.qcg-staging.middlewares=sec-headers,rate-login
+      - traefik.http.routers.qcg-staging.tls.certresolver=le
       - traefik.http.routers.qcg-staging.service=qcg
 
 networks:
-  proxy: {external: true}   # existing traefik network
+  proxy: {name: "manar-stack_default", external: true}   # existing traefik network
   internal: {}
 
 volumes: {pgdata: {}}
