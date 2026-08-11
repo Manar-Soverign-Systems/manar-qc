@@ -1,0 +1,56 @@
+name: PR title check + tests
+
+on:
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: manar_qc
+          POSTGRES_USER: manar
+          POSTGRES_PASSWORD: testpass
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-retries 10
+        ports: ["5432:5432"]
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-retries 5
+        ports: ["6379:6379"]
+
+    env:
+      SECRET_KEY: ci-test-secret-key
+      DEBUG: "1"
+      POSTGRES_PASSWORD: testpass
+      ALLOWED_HOSTS: localhost
+      DATABASE_URL: postgres://manar:testpass@localhost:5432/manar_qc
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run migrations
+        run: python qc/manage.py migrate
+        working-directory: .
+
+      - name: Run tests
+        run: python qc/manage.py test core --verbosity=2
+        working-directory: .

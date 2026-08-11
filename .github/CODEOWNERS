@@ -1,0 +1,12 @@
+# Code Owners — manar-qc
+# All PRs require review from Farabi before merge.
+
+* @farabibinimran-beep
+
+# Deployment-sensitive files require Farabi's explicit review
+docker-compose.yml @farabibinimran-beep
+Dockerfile @farabibinimran-beep
+traefik-dynamic.yml @farabibinimran-beep
+qc/qc/settings.py @farabibinimran-beep
+docs/ @farabibinimran-beep
+deploy/ @farabibinimran-beep
